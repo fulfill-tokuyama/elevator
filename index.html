@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キッズエレベーター</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #elevator-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, #e0e0e0 0%, #b0b0b0 100%);
+            border-radius: 20px;
+            padding: 20px 30px 10px 30px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #floor-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            grid-gap: 10px;
+            margin-bottom: 10px;
+        }
+        .floor-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            background-color: #222;
+            color: #FFD700;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .floor-button.selected {
+            background-color: #FFD700;
+            color: #222;
+        }
+        .floor-button:hover {
+            transform: scale(1.1);
+            background-color: #444;
+        }
+        #door-buttons {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 5px;
+        }
+        .door-button {
+            width: 60px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #333;
+            background-color: #4FC3F7;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .door-button.close {
+            background-color: #FF7043;
+        }
+        .door-button:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+        #camera-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+        .camera-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .camera-button:hover {
+            transform: scale(1.1);
+        }
+        #character-selector {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        .character-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background-color: #FFD700;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .character-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="elevator-panel">
+        <div id="floor-buttons">
+            <button class="floor-button" onclick="moveToFloor(1)">1</button>
+            <button class="floor-button" onclick="moveToFloor(2)">2</button>
+            <button class="floor-button" onclick="moveToFloor(3)">3</button>
+            <button class="floor-button" onclick="moveToFloor(4)">4</button>
+            <button class="floor-button" onclick="moveToFloor(5)">5</button>
+            <button class="floor-button" onclick="moveToFloor(6)">6</button>
+            <button class="floor-button" onclick="moveToFloor(7)">7</button>
+            <button class="floor-button" onclick="moveToFloor(8)">8</button>
+            <button class="floor-button" onclick="moveToFloor(9)">9</button>
+            <button class="floor-button" onclick="moveToFloor(10)">10</button>
+        </div>
+        <div id="door-buttons">
+            <button class="door-button open" onclick="openDoors()">開</button>
+            <button class="door-button close" onclick="closeDoors()">閉</button>
+        </div>
+    </div>
+    <div id="camera-controls">
+        <button class="camera-button" onclick="changeCameraView('front')">👁️</button>
+        <button class="camera-button" onclick="changeCameraView('side')">👁️</button>
+        <button class="camera-button" onclick="changeCameraView('top')">👁️</button>
+    </div>
+    <div id="character-selector">
+        <button class="character-button" onclick="changeCharacter('panda')">🐼</button>
+        <button class="character-button" onclick="changeCharacter('rabbit')">🐰</button>
+        <button class="character-button" onclick="changeCharacter('cat')">🐱</button>
+    </div>
+    <script src="elevator.js"></script>
+</body>
+</html>
