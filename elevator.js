@@ -73,10 +73,10 @@ function createBuilding() {
 
 // エレベーターの作成
 function createElevator() {
-    // エレベーター本体（大きくする）
-    const elevatorWidth = 4.5;
-    const elevatorHeight = 6;
-    const elevatorDepth = 4.5;
+    // エレベーター本体（さらに大きくする）
+    const elevatorWidth = 8.0;
+    const elevatorHeight = 10.0;
+    const elevatorDepth = 8.0;
     const elevatorGeometry = new THREE.BoxGeometry(elevatorWidth, elevatorHeight, elevatorDepth);
     const elevatorMaterial = new THREE.MeshPhongMaterial({ 
         color: 0xffffff,
@@ -105,8 +105,8 @@ function createElevator() {
 
     // --- 鏡（後ろ壁の中央下部） ---
     const mirrorMaterial = new THREE.MeshPhongMaterial({ color: 0xbbbbbb, shininess: 100, specular: 0xffffff, transparent: true, opacity: 0.7 });
-    const mirror = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3.5, 0.03), mirrorMaterial);
-    mirror.position.set(0, -0.5, -elevatorDepth/2 + 0.04);
+    const mirror = new THREE.Mesh(new THREE.BoxGeometry(2.5, 6.5, 0.03), mirrorMaterial);
+    mirror.position.set(0, -1.0, -elevatorDepth/2 + 0.04);
     elevator.add(mirror);
 
     // --- 天井（明るい白） ---
@@ -123,20 +123,20 @@ function createElevator() {
 
     // --- 手すり（右壁に円柱） ---
     const railMaterial = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 80 });
-    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.7, 16), railMaterial);
-    rail.position.set(elevatorWidth/2 - 0.18, -1.5, 1.0);
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 5.5, 32), railMaterial);
+    rail.position.set(elevatorWidth/2 - 0.18, -2.5, 2.0);
     rail.rotation.z = Math.PI / 2;
     elevator.add(rail);
 
-    // --- 操作パネル（右壁に画像を貼る） ---
+    // --- 操作パネル（右壁に画像を貼る・大きく自然に表示） ---
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(
         '/操作パネル.png',
         function(panelTexture) {
-            const panelGeo = new THREE.PlaneGeometry(0.9, 2.2);
+            const panelGeo = new THREE.PlaneGeometry(2.2, 5.0);
             const panelMat = new THREE.MeshBasicMaterial({ map: panelTexture, transparent: true });
             const panelMesh = new THREE.Mesh(panelGeo, panelMat);
-            panelMesh.position.set(elevatorWidth/2 - 0.03, 0.5, 0.7);
+            panelMesh.position.set(elevatorWidth/2 - 0.03, 0.8, 2.2);
             panelMesh.rotation.y = -Math.PI/2;
             elevator.add(panelMesh);
         },
@@ -147,16 +147,16 @@ function createElevator() {
     );
 
     // --- ドアの作成（前面） ---
-    const doorGeometry = new THREE.BoxGeometry(2.1, 5.2, 0.1);
+    const doorGeometry = new THREE.BoxGeometry(3.8, 8.5, 0.1);
     const doorMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
     // 左ドア
     const leftDoor = new THREE.Mesh(doorGeometry, doorMaterial);
-    leftDoor.position.set(-1.05, 0, elevatorDepth/2 - 0.05);
+    leftDoor.position.set(-1.9, 0, elevatorDepth/2 - 0.05);
     elevator.add(leftDoor);
     elevatorDoors.push(leftDoor);
     // 右ドア
     const rightDoor = new THREE.Mesh(doorGeometry, doorMaterial);
-    rightDoor.position.set(1.05, 0, elevatorDepth/2 - 0.05);
+    rightDoor.position.set(1.9, 0, elevatorDepth/2 - 0.05);
     elevator.add(rightDoor);
     elevatorDoors.push(rightDoor);
 }
@@ -257,16 +257,16 @@ function changeCharacter(type) {
         textureLoader.load(
             imageFile,
             function(texture) {
-                const geometry = new THREE.PlaneGeometry(1.2, 1.2);
+                const geometry = new THREE.PlaneGeometry(1.8, 1.8);
                 const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
                 characterModel = new THREE.Mesh(geometry, material);
-                characterModel.position.set(0, 0, 1.1);
+                characterModel.position.set(0, -2.5, 2.7);
                 characterModel.rotation.y = Math.PI;
                 elevator.add(characterModel);
             },
             undefined,
             function(err) {
-                alert('画像の読み込みに失敗しました: ' + imageFile);
+                // エラー時は何も表示しない
             }
         );
     }
