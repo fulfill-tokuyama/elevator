@@ -51,24 +51,35 @@ function init() {
 
 // 建物の作成
 function createBuilding() {
-    const buildingGeometry = new THREE.BoxGeometry(8, floorHeight * floors, 8);
+    // 建物のサイズをエレベーターに合わせて大きくする
+    const buildingWidth = 12;
+    const buildingHeight = floorHeight * floors + 2;
+    const buildingDepth = 12;
+    const buildingGeometry = new THREE.BoxGeometry(buildingWidth, buildingHeight, buildingDepth);
     const buildingMaterial = new THREE.MeshPhongMaterial({ 
         color: 0xcccccc,
         transparent: true,
         opacity: 0.8
     });
     const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
-    building.position.y = (floorHeight * floors) / 2;
+    building.position.y = buildingHeight / 2 - 1;
     scene.add(building);
 
     // 各階の床を作成
     for (let i = 0; i < floors; i++) {
-        const floorGeometry = new THREE.BoxGeometry(8, 0.2, 8);
+        const floorGeometry = new THREE.BoxGeometry(buildingWidth, 0.2, buildingDepth);
         const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.position.y = i * floorHeight;
         scene.add(floor);
     }
+
+    // --- 建物外の地面を追加 ---
+    const groundGeometry = new THREE.BoxGeometry(40, 0.5, 40);
+    const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x55aa55 }); // 緑色
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.position.y = -0.25; // 地上レベル
+    scene.add(ground);
 }
 
 // エレベーターの作成
@@ -147,16 +158,19 @@ function createElevator() {
     );
 
     // --- ドアの作成（前面） ---
-    const doorGeometry = new THREE.BoxGeometry(3.8, 8.5, 0.1);
+    // 扉の幅をエレベーター幅の半分にし、開閉範囲も調整
+    const doorWidth = elevatorWidth / 2;
+    const doorHeight = elevatorHeight * 0.85;
+    const doorGeometry = new THREE.BoxGeometry(doorWidth, doorHeight, 0.1);
     const doorMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
     // 左ドア
     const leftDoor = new THREE.Mesh(doorGeometry, doorMaterial);
-    leftDoor.position.set(-1.9, 0, elevatorDepth/2 - 0.05);
+    leftDoor.position.set(-doorWidth / 2, 0, elevatorDepth/2 - 0.05);
     elevator.add(leftDoor);
     elevatorDoors.push(leftDoor);
     // 右ドア
     const rightDoor = new THREE.Mesh(doorGeometry, doorMaterial);
-    rightDoor.position.set(1.9, 0, elevatorDepth/2 - 0.05);
+    rightDoor.position.set(doorWidth / 2, 0, elevatorDepth/2 - 0.05);
     elevator.add(rightDoor);
     elevatorDoors.push(rightDoor);
 }
@@ -168,7 +182,9 @@ function animateDoors(isOpening) {
     const duration = 1000;
     const startTime = Date.now();
     const startPositions = elevatorDoors.map(door => door.position.x);
-    const targetPositions = isOpening ? [-1.5, 1.5] : [-0.7, 0.7];
+    // 開くときは左右にエレベーター幅の1/2ずつ動かす
+    const openOffset = elevatorWidth / 2 - (elevatorWidth / 4);
+    const targetPositions = isOpening ? [-openOffset, openOffset] : [-(elevatorWidth / 4), (elevatorWidth / 4)];
 
     function animate() {
         const currentTime = Date.now();
