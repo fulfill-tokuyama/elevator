@@ -1,6 +1,6 @@
 let scene, camera, renderer, elevator, controls;
 let currentFloor = 1;
-const floorHeight = 5;
+const floorHeight = 10.0;
 const floors = 10;
 let elevatorDoors = [];
 let currentCharacter = null;
@@ -76,7 +76,7 @@ function createBuilding() {
 
     // --- 建物外の地面を追加 ---
     const groundGeometry = new THREE.BoxGeometry(40, 0.5, 40);
-    const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x55aa55 }); // 緑色
+    const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x66cc66 }); // 明るい芝生色
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.position.y = -0.25; // 地上レベル
     scene.add(ground);
