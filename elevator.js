@@ -73,27 +73,85 @@ function createBuilding() {
 
 // エレベーターの作成
 function createElevator() {
-    // エレベーター本体
+    // エレベーター本体（透明にして内部を見やすくする）
     const elevatorGeometry = new THREE.BoxGeometry(3, 4, 3);
     const elevatorMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0xff6b6b,
+        color: 0xffffff,
         transparent: true,
-        opacity: 0.9
+        opacity: 0.0 // 完全透明
     });
     elevator = new THREE.Mesh(elevatorGeometry, elevatorMaterial);
     elevator.position.y = 2;
     scene.add(elevator);
 
-    // ドアの作成
+    // --- 内部の壁（木目調色） ---
+    const wallColor = 0xdeb887; // 木目調
+    const wallMaterial = new THREE.MeshPhongMaterial({ color: wallColor });
+    // 後ろ壁
+    const backWall = new THREE.Mesh(new THREE.BoxGeometry(3, 4, 0.05), wallMaterial);
+    backWall.position.set(0, 0, -1.475);
+    elevator.add(backWall);
+    // 左壁
+    const leftWall = new THREE.Mesh(new THREE.BoxGeometry(0.05, 4, 3), wallMaterial);
+    leftWall.position.set(-1.475, 0, 0);
+    elevator.add(leftWall);
+    // 右壁
+    const rightWall = new THREE.Mesh(new THREE.BoxGeometry(0.05, 4, 3), wallMaterial);
+    rightWall.position.set(1.475, 0, 0);
+    elevator.add(rightWall);
+
+    // --- 鏡（後ろ壁の中央下部） ---
+    const mirrorMaterial = new THREE.MeshPhongMaterial({ color: 0xbbbbbb, shininess: 100, specular: 0xffffff, transparent: true, opacity: 0.7 });
+    const mirror = new THREE.Mesh(new THREE.BoxGeometry(1, 2.5, 0.03), mirrorMaterial);
+    mirror.position.set(0, -0.25, -1.45);
+    elevator.add(mirror);
+
+    // --- 天井（明るい白） ---
+    const ceilingMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.7 });
+    const ceiling = new THREE.Mesh(new THREE.BoxGeometry(2.95, 0.08, 2.95), ceilingMaterial);
+    ceiling.position.set(0, 2, 0);
+    elevator.add(ceiling);
+
+    // --- 床（タイル風の明るいグレー） ---
+    const floorMaterial = new THREE.MeshPhongMaterial({ color: 0xe0e0e0 });
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(2.95, 0.08, 2.95), floorMaterial);
+    floor.position.set(0, -2, 0);
+    elevator.add(floor);
+
+    // --- 手すり（右壁に円柱） ---
+    const railMaterial = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 80 });
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.8, 16), railMaterial);
+    rail.position.set(1.35, -1, 0.7);
+    rail.rotation.z = Math.PI / 2;
+    elevator.add(rail);
+
+    // --- 操作パネル（右壁にパネル＋ボタン） ---
+    const panelMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 });
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.2, 0.05), panelMaterial);
+    panel.position.set(1.48, 0.2, 0.3);
+    elevator.add(panel);
+    // ボタン（円）
+    for (let i = 0; i < 10; i++) {
+        const btnMat = new THREE.MeshPhongMaterial({ color: 0xffd700 });
+        const btn = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.03, 24), btnMat);
+        btn.position.set(1.51, 0.7 - (i * 0.13), 0.32);
+        btn.rotation.x = Math.PI / 2;
+        elevator.add(btn);
+    }
+    // ディスプレイ（上部に四角）
+    const dispMat = new THREE.MeshPhongMaterial({ color: 0x111111, emissive: 0xffa500, emissiveIntensity: 0.3 });
+    const disp = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.12, 0.03), dispMat);
+    disp.position.set(1.51, 0.85, 0.32);
+    elevator.add(disp);
+
+    // --- ドアの作成（前面） ---
     const doorGeometry = new THREE.BoxGeometry(1.4, 3.5, 0.1);
     const doorMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
-
     // 左ドア
     const leftDoor = new THREE.Mesh(doorGeometry, doorMaterial);
     leftDoor.position.set(-0.7, 0, 1.5);
     elevator.add(leftDoor);
     elevatorDoors.push(leftDoor);
-
     // 右ドア
     const rightDoor = new THREE.Mesh(doorGeometry, doorMaterial);
     rightDoor.position.set(0.7, 0, 1.5);
