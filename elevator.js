@@ -110,13 +110,15 @@ function createRail() {
     const railGeometry1 = new THREE.TorusGeometry(railRadius + railGap / 2, railTube, 16, railSegments);
     const railMaterial1 = new THREE.MeshPhongMaterial({ color: 0x666666, metalness: 0.8 });
     rail1 = new THREE.Mesh(railGeometry1, railMaterial1);
-    rail1.position.y = 0; // 地面に沿わせる
+    rail1.position.y = 0;
+    rail1.rotation.x = Math.PI / 2;
     scene.add(rail1);
     // 内側レール
     const railGeometry2 = new THREE.TorusGeometry(railRadius - railGap / 2, railTube, 16, railSegments);
     const railMaterial2 = new THREE.MeshPhongMaterial({ color: 0x666666, metalness: 0.8 });
     rail2 = new THREE.Mesh(railGeometry2, railMaterial2);
-    rail2.position.y = 0; // 地面に沿わせる
+    rail2.position.y = 0;
+    rail2.rotation.x = Math.PI / 2;
     scene.add(rail2);
 }
 
