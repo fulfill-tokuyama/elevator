@@ -1,6 +1,6 @@
 let scene, camera, renderer, elevator, controls;
 let currentFloor = 1;
-const floorHeight = 10.0;
+const floorHeight = 15.0;  // 階高を15.0に増加（エレベーターより高く）
 const floors = 10;
 let elevatorDoors = [];
 let currentCharacter = null;
@@ -16,7 +16,7 @@ function init() {
 
     // カメラの設定
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 5, 10);
+    camera.position.set(0, 5, 20);  // カメラを少し離す
     camera.lookAt(0, 0, 0);
 
     // レンダラーの設定
@@ -65,9 +65,9 @@ function createBuilding() {
     building.position.y = buildingHeight / 2 - 1;
     scene.add(building);
 
-    // 各階の床を作成
+    // 各階の床を作成（床の厚さを薄く）
     for (let i = 0; i < floors; i++) {
-        const floorGeometry = new THREE.BoxGeometry(buildingWidth, 0.2, buildingDepth);
+        const floorGeometry = new THREE.BoxGeometry(buildingWidth, 0.5, buildingDepth);  // 床の厚さを0.5に
         const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.position.y = i * floorHeight;
@@ -84,10 +84,10 @@ function createBuilding() {
 
 // エレベーターの作成
 function createElevator() {
-    // エレベーター本体（さらに大きくする）
-    const elevatorWidth = 8.0;
-    const elevatorHeight = 10.0;
-    const elevatorDepth = 8.0;
+    // エレベーター本体（高さを8.0に縮小）
+    const elevatorWidth = 6.0;    // 幅も少し小さく
+    const elevatorHeight = 8.0;   // 高さを8.0に（階高15.0より十分小さく）
+    const elevatorDepth = 6.0;    // 奥行きも少し小さく
     const elevatorGeometry = new THREE.BoxGeometry(elevatorWidth, elevatorHeight, elevatorDepth);
     const elevatorMaterial = new THREE.MeshPhongMaterial({ 
         color: 0xffffff,
@@ -95,7 +95,7 @@ function createElevator() {
         opacity: 0.0 // 完全透明
     });
     elevator = new THREE.Mesh(elevatorGeometry, elevatorMaterial);
-    elevator.position.y = elevatorHeight / 2 - 0.5;
+    elevator.position.y = elevatorHeight / 2 + 0.5;  // 床から少し上に配置
     scene.add(elevator);
 
     // --- 内部の壁（木目調色） ---
@@ -116,8 +116,8 @@ function createElevator() {
 
     // --- 鏡（後ろ壁の中央下部） ---
     const mirrorMaterial = new THREE.MeshPhongMaterial({ color: 0xbbbbbb, shininess: 100, specular: 0xffffff, transparent: true, opacity: 0.7 });
-    const mirror = new THREE.Mesh(new THREE.BoxGeometry(2.5, 6.5, 0.03), mirrorMaterial);
-    mirror.position.set(0, -1.0, -elevatorDepth/2 + 0.04);
+    const mirror = new THREE.Mesh(new THREE.BoxGeometry(2.0, 5.0, 0.03), mirrorMaterial);  // サイズ調整
+    mirror.position.set(0, -0.5, -elevatorDepth/2 + 0.04);
     elevator.add(mirror);
 
     // --- 天井（明るい白） ---
@@ -134,20 +134,20 @@ function createElevator() {
 
     // --- 手すり（右壁に円柱） ---
     const railMaterial = new THREE.MeshPhongMaterial({ color: 0x888888, shininess: 80 });
-    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 5.5, 32), railMaterial);
-    rail.position.set(elevatorWidth/2 - 0.18, -2.5, 2.0);
+    const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4.0, 32), railMaterial);  // サイズ調整
+    rail.position.set(elevatorWidth/2 - 0.15, -2.0, 1.5);
     rail.rotation.z = Math.PI / 2;
     elevator.add(rail);
 
-    // --- 操作パネル（右壁に画像を貼る・大きく自然に表示） ---
+    // --- 操作パネル（右壁に画像を貼る） ---
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load(
         '/操作パネル.png',
         function(panelTexture) {
-            const panelGeo = new THREE.PlaneGeometry(2.2, 5.0);
+            const panelGeo = new THREE.PlaneGeometry(1.8, 4.0);  // サイズ調整
             const panelMat = new THREE.MeshBasicMaterial({ map: panelTexture, transparent: true });
             const panelMesh = new THREE.Mesh(panelGeo, panelMat);
-            panelMesh.position.set(elevatorWidth/2 - 0.03, 0.8, 2.2);
+            panelMesh.position.set(elevatorWidth/2 - 0.03, 0.5, 1.5);
             panelMesh.rotation.y = -Math.PI/2;
             elevator.add(panelMesh);
         },
@@ -158,7 +158,6 @@ function createElevator() {
     );
 
     // --- ドアの作成（前面） ---
-    // 扉の幅をエレベーター幅の半分にし、開閉範囲も調整
     const doorWidth = elevatorWidth / 2;
     const doorHeight = elevatorHeight * 0.85;
     const doorGeometry = new THREE.BoxGeometry(doorWidth, doorHeight, 0.1);
@@ -183,6 +182,7 @@ function animateDoors(isOpening) {
     const startTime = Date.now();
     const startPositions = elevatorDoors.map(door => door.position.x);
     // 開くときは左右にエレベーター幅の1/2ずつ動かす
+    const elevatorWidth = 6.0;  // エレベーターの幅と合わせる
     const openOffset = elevatorWidth / 2 - (elevatorWidth / 4);
     const targetPositions = isOpening ? [-openOffset, openOffset] : [-(elevatorWidth / 4), (elevatorWidth / 4)];
 
@@ -221,7 +221,7 @@ function moveToFloor(floor) {
     // ボタンの選択状態を更新
     updateFloorButtonSelection(floor);
     setTimeout(() => {
-        const targetY = (floor - 1) * floorHeight + 2;
+        const targetY = (floor - 1) * floorHeight + 4.5;  // エレベーターの高さに合わせて調整
         const duration = 2000;
         const startY = elevator.position.y;
         const startTime = Date.now();
@@ -273,10 +273,10 @@ function changeCharacter(type) {
         textureLoader.load(
             imageFile,
             function(texture) {
-                const geometry = new THREE.PlaneGeometry(1.8, 1.8);
+                const geometry = new THREE.PlaneGeometry(1.5, 1.5);  // サイズ調整
                 const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
                 characterModel = new THREE.Mesh(geometry, material);
-                characterModel.position.set(0, -2.5, 2.7);
+                characterModel.position.set(0, -2.0, 2.0);  // 位置調整
                 characterModel.rotation.y = Math.PI;
                 elevator.add(characterModel);
             },
@@ -293,13 +293,13 @@ function changeCharacter(type) {
 function changeCameraView(view) {
     switch(view) {
         case 'front':
-            camera.position.set(0, 5, 10);
+            camera.position.set(0, 5, 20);
             break;
         case 'side':
-            camera.position.set(10, 5, 0);
+            camera.position.set(20, 5, 0);
             break;
         case 'top':
-            camera.position.set(0, 15, 0);
+            camera.position.set(0, 30, 0);
             break;
     }
     camera.lookAt(0, 0, 0);
