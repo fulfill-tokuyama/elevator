@@ -78,7 +78,7 @@ function createBuilding() {
     scene.add(building);
 
     // 地面の作成
-    const groundGeometry = new THREE.PlaneGeometry(750, 750);
+    const groundGeometry = new THREE.PlaneGeometry(1500, 1500);
     const groundMaterial = new THREE.MeshPhongMaterial({ 
         color: 0x4CAF50,
         side: THREE.DoubleSide
@@ -248,12 +248,13 @@ function updateTrainPosition() {
     // 右回り（時計回り）
     const x = Math.cos(trainAngle) * trainRadius;
     const z = Math.sin(trainAngle) * trainRadius;
-    train.position.set(x, 1.0, z);
+    const railTube = 0.12; // レールの太さ
+    train.position.set(x, railTube, z);
     // 進行方向ベクトル
     const nextAngle = trainAngle - 0.01;
     const nextX = Math.cos(nextAngle) * trainRadius;
     const nextZ = Math.sin(nextAngle) * trainRadius;
-    train.lookAt(new THREE.Vector3(nextX, train.position.y, nextZ));
+    train.lookAt(new THREE.Vector3(nextX, railTube, nextZ));
 }
 
 // ドアの開閉アニメーション
