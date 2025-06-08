@@ -11,6 +11,7 @@ let train = null;
 let trainAngle = 0;
 const trainRadius = 15; // 電車の走行半径
 const trainSpeed = 0.005; // 電車の速度
+let rail = null;
 
 // シーンの初期化
 function init() {
@@ -43,6 +44,9 @@ function init() {
     // 建物の作成
     createBuilding();
     
+    // 線路の作成
+    createRail();
+
     // エレベーターの作成
     createElevator();
 
@@ -91,6 +95,18 @@ function createBuilding() {
         floor.position.y = i * floorHeight;
         scene.add(floor);
     }
+}
+
+// 円状の線路を作成
+function createRail() {
+    const railRadius = trainRadius; // 電車の走行半径と同じ
+    const railTube = 0.12;
+    const railSegments = 120;
+    const railGeometry = new THREE.TorusGeometry(railRadius, railTube, 16, railSegments);
+    const railMaterial = new THREE.MeshPhongMaterial({ color: 0x666666, metalness: 0.8 });
+    rail = new THREE.Mesh(railGeometry, railMaterial);
+    rail.position.y = 0.15; // 少し地面から浮かせる
+    scene.add(rail);
 }
 
 // エレベーターの作成
@@ -216,10 +232,15 @@ function createTrain() {
 
 function updateTrainPosition() {
     if (!train) return;
+    // 右回り（時計回り）
     const x = Math.cos(trainAngle) * trainRadius;
     const z = Math.sin(trainAngle) * trainRadius;
     train.position.set(x, 1.0, z);
-    train.rotation.y = trainAngle + Math.PI / 2;
+    // 進行方向ベクトル
+    const nextAngle = trainAngle - 0.01;
+    const nextX = Math.cos(nextAngle) * trainRadius;
+    const nextZ = Math.sin(nextAngle) * trainRadius;
+    train.lookAt(new THREE.Vector3(nextX, 1.0, nextZ));
 }
 
 // ドアの開閉アニメーション
@@ -354,9 +375,9 @@ function changeCameraView(view) {
 function animate() {
     requestAnimationFrame(animate);
     
-    // 電車のアニメーション
+    // 電車のアニメーション（右回り）
     if (train) {
-        trainAngle += trainSpeed;
+        trainAngle -= trainSpeed;
         updateTrainPosition();
     }
     
