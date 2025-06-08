@@ -123,6 +123,31 @@
         .character-button:hover {
             transform: scale(1.1);
         }
+        #height-controls {
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 200;
+        }
+        #height-controls button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: background 0.2s, transform 0.2s;
+        }
+        #height-controls button:hover {
+            background-color: #388e3c;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -154,6 +179,20 @@
         <button class="character-button" onclick="changeCharacter('rabbit')">🐰</button>
         <button class="character-button" onclick="changeCharacter('cat')">🐱</button>
     </div>
+    <div id="height-controls">
+        <button id="up-button">▲</button>
+        <button id="down-button">▼</button>
+    </div>
     <script src="elevator.js"></script>
+    <script>
+    document.getElementById('up-button').onclick = function() {
+        camera.position.y += 5;
+        camera.lookAt(0, 0, 0);
+    };
+    document.getElementById('down-button').onclick = function() {
+        camera.position.y -= 5;
+        camera.lookAt(0, 0, 0);
+    };
+    </script>
 </body>
 </html>
