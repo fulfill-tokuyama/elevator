@@ -9,9 +9,14 @@ let doorsOpen = true;
 let moving = false;
 let train = null;
 let trainAngle = 0;
-const trainRadius = 15; // 電車の走行半径
+let rail1 = null;
+let rail2 = null;
+const buildingSize = 8; // 建物の幅
+const railGap = 0.7; // レール間隔
+const railMargin = 4; // 建物からレールまでの余白
+const railRadius = (buildingSize / 2) + railMargin + (railGap / 2); // レール中心半径
+const trainRadius = railRadius; // 電車の走行半径をレールに合わせる
 const trainSpeed = 0.005; // 電車の速度
-let rail = null;
 
 // シーンの初期化
 function init() {
@@ -97,16 +102,22 @@ function createBuilding() {
     }
 }
 
-// 円状の線路を作成
+// 円状の2本レールを作成
 function createRail() {
-    const railRadius = trainRadius; // 電車の走行半径と同じ
     const railTube = 0.12;
     const railSegments = 120;
-    const railGeometry = new THREE.TorusGeometry(railRadius, railTube, 16, railSegments);
-    const railMaterial = new THREE.MeshPhongMaterial({ color: 0x666666, metalness: 0.8 });
-    rail = new THREE.Mesh(railGeometry, railMaterial);
-    rail.position.y = 0.15; // 少し地面から浮かせる
-    scene.add(rail);
+    // 外側レール
+    const railGeometry1 = new THREE.TorusGeometry(railRadius + railGap / 2, railTube, 16, railSegments);
+    const railMaterial1 = new THREE.MeshPhongMaterial({ color: 0x666666, metalness: 0.8 });
+    rail1 = new THREE.Mesh(railGeometry1, railMaterial1);
+    rail1.position.y = 0.15;
+    scene.add(rail1);
+    // 内側レール
+    const railGeometry2 = new THREE.TorusGeometry(railRadius - railGap / 2, railTube, 16, railSegments);
+    const railMaterial2 = new THREE.MeshPhongMaterial({ color: 0x666666, metalness: 0.8 });
+    rail2 = new THREE.Mesh(railGeometry2, railMaterial2);
+    rail2.position.y = 0.15;
+    scene.add(rail2);
 }
 
 // エレベーターの作成
