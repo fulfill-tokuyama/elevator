@@ -162,14 +162,18 @@ function createElevator() {
     const doorHeight = elevatorHeight * 0.85;
     const doorGeometry = new THREE.BoxGeometry(doorWidth, doorHeight, 0.1);
     const doorMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff });
-    // 左ドア
+
+    // ドアを開いた状態の位置で作成
+    const openOffset = elevatorWidth / 2 - (elevatorWidth / 4);
+
+    // 左ドア（開いた位置）
     const leftDoor = new THREE.Mesh(doorGeometry, doorMaterial);
-    leftDoor.position.set(-doorWidth / 2, 0, elevatorDepth/2 - 0.05);
+    leftDoor.position.set(-openOffset, 0, elevatorDepth/2 - 0.05);
     elevator.add(leftDoor);
     elevatorDoors.push(leftDoor);
-    // 右ドア
+    // 右ドア（開いた位置）
     const rightDoor = new THREE.Mesh(doorGeometry, doorMaterial);
-    rightDoor.position.set(doorWidth / 2, 0, elevatorDepth/2 - 0.05);
+    rightDoor.position.set(openOffset, 0, elevatorDepth/2 - 0.05);
     elevator.add(rightDoor);
     elevatorDoors.push(rightDoor);
 }
