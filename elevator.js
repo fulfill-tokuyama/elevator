@@ -58,9 +58,6 @@ function init() {
     // 電車の作成
     createTrain();
 
-    // デフォルトのキャラクターを設定
-    changeCharacter('panda');
-
     // アニメーション開始
     animate();
 }
