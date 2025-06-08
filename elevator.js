@@ -240,7 +240,7 @@ function updateTrainPosition() {
     const nextAngle = trainAngle - 0.01;
     const nextX = Math.cos(nextAngle) * trainRadius;
     const nextZ = Math.sin(nextAngle) * trainRadius;
-    train.lookAt(new THREE.Vector3(nextX, 1.0, nextZ));
+    train.lookAt(new THREE.Vector3(nextX, train.position.y, nextZ));
 }
 
 // ドアの開閉アニメーション
