@@ -336,39 +336,6 @@ function updateFloorButtonSelection(floor) {
     }
 }
 
-// キャラクターの変更
-function changeCharacter(type) {
-    if (characterModel) {
-        elevator.remove(characterModel);
-        characterModel = null;
-    }
-
-    let imageFile = null;
-    if (type === 'panda') imageFile = '/panda.png';
-    if (type === 'rabbit') imageFile = '/usagi.png';
-    if (type === 'cat') imageFile = '/cat.png';
-
-    if (imageFile) {
-        const textureLoader = new THREE.TextureLoader();
-        textureLoader.load(
-            imageFile,
-            function(texture) {
-                const geometry = new THREE.PlaneGeometry(1.2, 1.2);
-                const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-                characterModel = new THREE.Mesh(geometry, material);
-                characterModel.position.set(0, 0, 1.1);
-                characterModel.rotation.y = Math.PI;
-                elevator.add(characterModel);
-            },
-            undefined,
-            function(err) {
-                alert('画像の読み込みに失敗しました: ' + imageFile);
-            }
-        );
-    }
-    currentCharacter = type;
-}
-
 // カメラビューの変更
 function changeCameraView(view) {
     switch(view) {
