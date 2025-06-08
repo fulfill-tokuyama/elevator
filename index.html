@@ -72,6 +72,27 @@
             transform: scale(1.1);
             background-color: #444;
         }
+        #arrow-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .arrow-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            background-color: #222;
+            color: #FFD700;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .arrow-button:hover {
+            transform: scale(1.1);
+            background-color: #444;
+        }
         #door-buttons {
             display: flex;
             gap: 20px;
@@ -225,6 +246,10 @@
             <button class="floor-button" onclick="moveToFloor(8)">8</button>
             <button class="floor-button" onclick="moveToFloor(9)">9</button>
             <button class="floor-button" onclick="moveToFloor(10)">10</button>
+        </div>
+        <div id="arrow-buttons">
+            <button class="arrow-button" onclick="moveToFloor(Math.min(currentFloor + 1, 10))">⬆️</button>
+            <button class="arrow-button" onclick="moveToFloor(Math.max(currentFloor - 1, 1))">⬇️</button>
         </div>
         <div id="door-buttons">
             <button class="door-button open" onclick="openDoors()">開</button>

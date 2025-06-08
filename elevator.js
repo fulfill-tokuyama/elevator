@@ -61,10 +61,25 @@ function createBuilding() {
     building.position.y = (floorHeight * floors) / 2;
     scene.add(building);
 
+    // 地面の作成
+    const groundGeometry = new THREE.PlaneGeometry(50, 50);
+    const groundMaterial = new THREE.MeshPhongMaterial({ 
+        color: 0x4CAF50,
+        side: THREE.DoubleSide
+    });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = Math.PI / 2;
+    ground.position.y = -0.1;
+    scene.add(ground);
+
     // 各階の床を作成
     for (let i = 0; i < floors; i++) {
         const floorGeometry = new THREE.BoxGeometry(8, 0.2, 8);
-        const floorMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+        const floorMaterial = new THREE.MeshPhongMaterial({ 
+            color: 0x8B4513,
+            transparent: true,
+            opacity: 0.9
+        });
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.position.y = i * floorHeight;
         scene.add(floor);
