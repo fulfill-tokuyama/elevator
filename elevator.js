@@ -7,6 +7,10 @@ let currentCharacter = null;
 let characterModel = null;
 let doorsOpen = true;
 let moving = false;
+let train = null;
+let trainAngle = 0;
+const trainRadius = 15; // 電車の走行半径
+const trainSpeed = 0.005; // 電車の速度
 
 // シーンの初期化
 function init() {
@@ -41,6 +45,9 @@ function init() {
     
     // エレベーターの作成
     createElevator();
+
+    // 電車の作成
+    createTrain();
 
     // デフォルトのキャラクターを設定
     changeCharacter('panda');
@@ -114,6 +121,53 @@ function createElevator() {
     rightDoor.position.set(0.7, 0, 1.5);
     elevator.add(rightDoor);
     elevatorDoors.push(rightDoor);
+}
+
+// 電車の作成
+function createTrain() {
+    // 電車の本体
+    const trainGeometry = new THREE.BoxGeometry(3, 1.5, 1.5);
+    const trainMaterial = new THREE.MeshPhongMaterial({ color: 0xE91E63 });
+    train = new THREE.Mesh(trainGeometry, trainMaterial);
+    
+    // 電車の屋根
+    const roofGeometry = new THREE.BoxGeometry(3, 0.5, 1.5);
+    const roofMaterial = new THREE.MeshPhongMaterial({ color: 0x9C27B0 });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.y = 1;
+    train.add(roof);
+
+    // 電車の窓
+    const windowGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.1);
+    const windowMaterial = new THREE.MeshPhongMaterial({ color: 0x81D4FA });
+    
+    // 左側の窓
+    const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+    leftWindow.position.set(0, 0.3, 0.8);
+    train.add(leftWindow);
+    
+    // 右側の窓
+    const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+    rightWindow.position.set(0, 0.3, -0.8);
+    train.add(rightWindow);
+
+    // 電車の位置を初期化
+    updateTrainPosition();
+    scene.add(train);
+}
+
+// 電車の位置を更新
+function updateTrainPosition() {
+    if (!train) return;
+    
+    // 円運動の計算
+    const x = Math.cos(trainAngle) * trainRadius;
+    const z = Math.sin(trainAngle) * trainRadius;
+    
+    train.position.set(x, 0.75, z);
+    
+    // 電車の向きを進行方向に合わせる
+    train.rotation.y = trainAngle + Math.PI / 2;
 }
 
 // ドアの開閉アニメーション
@@ -247,6 +301,13 @@ function changeCameraView(view) {
 // アニメーションループ
 function animate() {
     requestAnimationFrame(animate);
+    
+    // 電車のアニメーション
+    if (train) {
+        trainAngle += trainSpeed;
+        updateTrainPosition();
+    }
+    
     controls.update();
     renderer.render(scene, camera);
 }
