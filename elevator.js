@@ -13,7 +13,7 @@ let rail1 = null;
 let rail2 = null;
 const buildingSize = 8; // 建物の幅
 const railGap = 0.7; // レール間隔
-const railMargin = 4; // 建物からレールまでの余白
+const railMargin = 12; // 建物からレールまでの余白を大きく
 const railRadius = (buildingSize / 2) + railMargin + (railGap / 2); // レール中心半径
 const trainRadius = railRadius; // 電車の走行半径をレールに合わせる
 const trainSpeed = 0.005; // 電車の速度
@@ -110,13 +110,13 @@ function createRail() {
     const railGeometry1 = new THREE.TorusGeometry(railRadius + railGap / 2, railTube, 16, railSegments);
     const railMaterial1 = new THREE.MeshPhongMaterial({ color: 0x666666, metalness: 0.8 });
     rail1 = new THREE.Mesh(railGeometry1, railMaterial1);
-    rail1.position.y = 0.15;
+    rail1.position.y = 0; // 地面に沿わせる
     scene.add(rail1);
     // 内側レール
     const railGeometry2 = new THREE.TorusGeometry(railRadius - railGap / 2, railTube, 16, railSegments);
     const railMaterial2 = new THREE.MeshPhongMaterial({ color: 0x666666, metalness: 0.8 });
     rail2 = new THREE.Mesh(railGeometry2, railMaterial2);
-    rail2.position.y = 0.15;
+    rail2.position.y = 0; // 地面に沿わせる
     scene.add(rail2);
 }
 
