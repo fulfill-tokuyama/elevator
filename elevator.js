@@ -123,50 +123,102 @@ function createElevator() {
     elevatorDoors.push(rightDoor);
 }
 
-// 電車の作成
+// 阪急電車風の電車を作成
 function createTrain() {
-    // 電車の本体
-    const trainGeometry = new THREE.BoxGeometry(3, 1.5, 1.5);
-    const trainMaterial = new THREE.MeshPhongMaterial({ color: 0xE91E63 });
-    train = new THREE.Mesh(trainGeometry, trainMaterial);
-    
-    // 電車の屋根
-    const roofGeometry = new THREE.BoxGeometry(3, 0.5, 1.5);
-    const roofMaterial = new THREE.MeshPhongMaterial({ color: 0x9C27B0 });
+    train = new THREE.Group();
+    const maroonColor = 0x7B3F00;
+    const creamColor = 0xFFF8DC;
+    const blackColor = 0x222222;
+
+    // 車体本体（長さ10）
+    const bodyGeometry = new THREE.BoxGeometry(10, 2, 1.8);
+    const bodyMaterial = new THREE.MeshPhongMaterial({ color: maroonColor, shininess: 100 });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.position.y = 1.1;
+    body.castShadow = true;
+    body.receiveShadow = true;
+    train.add(body);
+
+    // 屋根
+    const roofGeometry = new THREE.BoxGeometry(10, 0.3, 2.1);
+    const roofMaterial = new THREE.MeshPhongMaterial({ color: 0x999999, metalness: 0.8 });
     const roof = new THREE.Mesh(roofGeometry, roofMaterial);
-    roof.position.y = 1;
+    roof.position.y = 2.35;
     train.add(roof);
 
-    // 電車の窓
-    const windowGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.1);
-    const windowMaterial = new THREE.MeshPhongMaterial({ color: 0x81D4FA });
-    
-    // 左側の窓
-    const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    leftWindow.position.set(0, 0.3, 0.8);
-    train.add(leftWindow);
-    
-    // 右側の窓
-    const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
-    rightWindow.position.set(0, 0.3, -0.8);
-    train.add(rightWindow);
+    // 窓のライン
+    const windowLineGeometry = new THREE.BoxGeometry(9.5, 0.7, 2.0);
+    const windowLineMaterial = new THREE.MeshPhongMaterial({ color: creamColor });
+    const windowLine = new THREE.Mesh(windowLineGeometry, windowLineMaterial);
+    windowLine.position.y = 1.1;
+    train.add(windowLine);
 
-    // 電車の位置を初期化
+    // 個別の窓
+    for (let i = -4; i <= 4; i += 2) {
+        if (Math.abs(i) <= 4) {
+            const windowGeometry = new THREE.BoxGeometry(1, 0.7, 2.05);
+            const windowMaterial = new THREE.MeshPhongMaterial({ color: 0x333333, opacity: 0.7, transparent: true });
+            const window = new THREE.Mesh(windowGeometry, windowMaterial);
+            window.position.set(i, 1.1, 0);
+            train.add(window);
+        }
+    }
+
+    // 前面（運転席）
+    const frontGeometry = new THREE.BoxGeometry(0.2, 2, 1.8);
+    const frontMaterial = new THREE.MeshPhongMaterial({ color: maroonColor });
+    const front = new THREE.Mesh(frontGeometry, frontMaterial);
+    front.position.set(5.1, 1.1, 0);
+    train.add(front);
+
+    // 前面窓
+    const frontWindowGeometry = new THREE.BoxGeometry(0.3, 1, 1.2);
+    const frontWindowMaterial = new THREE.MeshPhongMaterial({ color: 0x222222, opacity: 0.8, transparent: true });
+    const frontWindow = new THREE.Mesh(frontWindowGeometry, frontWindowMaterial);
+    frontWindow.position.set(5.2, 1.6, 0);
+    train.add(frontWindow);
+
+    // ヘッドライト
+    const headlightGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+    const headlightMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFAA, emissive: 0xFFFF00, emissiveIntensity: 0.5 });
+    const headlight1 = new THREE.Mesh(headlightGeometry, headlightMaterial);
+    headlight1.position.set(5.2, 0.8, 0.5);
+    train.add(headlight1);
+    const headlight2 = new THREE.Mesh(headlightGeometry, headlightMaterial);
+    headlight2.position.set(5.2, 0.8, -0.5);
+    train.add(headlight2);
+
+    // 台車（ボギー）
+    const bogieGeometry = new THREE.BoxGeometry(1.5, 0.25, 1.2);
+    const bogieMaterial = new THREE.MeshPhongMaterial({ color: blackColor });
+    const bogie1 = new THREE.Mesh(bogieGeometry, bogieMaterial);
+    bogie1.position.set(3, 0.15, 0);
+    train.add(bogie1);
+    const bogie2 = new THREE.Mesh(bogieGeometry, bogieMaterial);
+    bogie2.position.set(-3, 0.15, 0);
+    train.add(bogie2);
+
+    // 車輪
+    const wheelGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.15, 16);
+    const wheelMaterial = new THREE.MeshPhongMaterial({ color: 0x444444, metalness: 0.9 });
+    for (let x of [3, -3]) {
+        for (let z of [0.5, -0.5]) {
+            const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+            wheel.rotation.z = Math.PI / 2;
+            wheel.position.set(x, 0.3, z);
+            train.add(wheel);
+        }
+    }
+
     updateTrainPosition();
     scene.add(train);
 }
 
-// 電車の位置を更新
 function updateTrainPosition() {
     if (!train) return;
-    
-    // 円運動の計算
     const x = Math.cos(trainAngle) * trainRadius;
     const z = Math.sin(trainAngle) * trainRadius;
-    
     train.position.set(x, 1.0, z);
-    
-    // 電車の向きを進行方向に合わせる
     train.rotation.y = trainAngle + Math.PI / 2;
 }
 
