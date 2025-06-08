@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>キッズエレベーター</title>
+    
+    <!-- ===== PWA設定ここから ===== -->
+    <!-- Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- テーマカラー -->
+    <meta name="theme-color" content="#4ecdc4">
+    
+    <!-- iOSサポート -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="キッズエレベーター">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    
+    <!-- 従来のファビコン -->
+    <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+    
+    <!-- SEO -->
+    <meta name="description" content="2-4歳の子供向けエレベーターシミュレーター">
+    <!-- ===== PWA設定ここまで ===== -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
@@ -123,34 +144,75 @@
         .character-button:hover {
             transform: scale(1.1);
         }
-        #height-controls {
+
+        /* PWA用追加スタイル */
+        .install-prompt {
             position: fixed;
-            right: 30px;
-            bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 200;
-        }
-        #height-controls button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            background-color: #4CAF50;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
             color: white;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            transition: background 0.2s, transform 0.2s;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            text-align: center;
+            animation: slideUp 0.3s ease;
         }
-        #height-controls button:hover {
-            background-color: #388e3c;
-            transform: scale(1.1);
+        
+        .install-prompt.show {
+            display: block;
+        }
+        
+        .install-prompt button {
+            background: white;
+            color: #4ecdc4;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            margin: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .offline-notice {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #ff6b6b;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            display: none;
+            z-index: 1001;
+        }
+        
+        .offline-notice.show {
+            display: block;
         }
     </style>
 </head>
 <body>
+    <!-- オフライン通知 -->
+    <div id="offline-notice" class="offline-notice">
+        📡 インターネットなしでも遊べます！
+    </div>
+    
+    <!-- インストール促進バナー -->
+    <div id="install-prompt" class="install-prompt">
+        <div>📱 ホーム画面に追加してアプリのように使えます！</div>
+        <button onclick="installApp()">追加する</button>
+        <button onclick="dismissInstallPrompt()">後で</button>
+    </div>
+
     <div id="elevator-panel">
         <div id="floor-buttons">
             <button class="floor-button" onclick="moveToFloor(1)">1</button>
@@ -179,20 +241,106 @@
         <button class="character-button" onclick="changeCharacter('rabbit')">🐰</button>
         <button class="character-button" onclick="changeCharacter('cat')">🐱</button>
     </div>
-    <div id="height-controls">
-        <button id="up-button">▲</button>
-        <button id="down-button">▼</button>
-    </div>
-    <script src="elevator.js"></script>
+
+    <!-- PWA JavaScript -->
     <script>
-    document.getElementById('up-button').onclick = function() {
-        camera.position.y += 5;
-        camera.lookAt(0, 0, 0);
-    };
-    document.getElementById('down-button').onclick = function() {
-        camera.position.y -= 5;
-        camera.lookAt(0, 0, 0);
-    };
+        // PWA機能の初期化
+        let deferredPrompt;
+        let isInstalled = false;
+
+        // Service Worker の登録
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registered successfully');
+                        
+                        // アップデートの監視
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // 新バージョンが利用可能
+                                    console.log('🔄 New version available');
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('❌ Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // インストール促進の処理
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('💡 Install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 5秒後にインストール促進を表示
+            setTimeout(() => {
+                if (!isInstalled) {
+                    showInstallPrompt();
+                }
+            }, 5000);
+        });
+
+        // インストール完了の検出
+        window.addEventListener('appinstalled', () => {
+            console.log('🎉 App installed successfully');
+            isInstalled = true;
+            hideInstallPrompt();
+        });
+
+        function showInstallPrompt() {
+            const prompt = document.getElementById('install-prompt');
+            if (prompt) {
+                prompt.classList.add('show');
+            }
+        }
+
+        function hideInstallPrompt() {
+            const prompt = document.getElementById('install-prompt');
+            if (prompt) {
+                prompt.classList.remove('show');
+            }
+        }
+
+        function installApp() {
+            hideInstallPrompt();
+            
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('👍 User accepted the install prompt');
+                    } else {
+                        console.log('👎 User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        function dismissInstallPrompt() {
+            hideInstallPrompt();
+        }
+
+        // オンライン/オフライン状態の監視
+        window.addEventListener('online', () => {
+            console.log('🌐 Online');
+            const notice = document.getElementById('offline-notice');
+            if (notice) notice.classList.remove('show');
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📡 Offline');
+            const notice = document.getElementById('offline-notice');
+            if (notice) notice.classList.add('show');
+        });
     </script>
+
+    <script src="elevator.js"></script>
 </body>
 </html>
