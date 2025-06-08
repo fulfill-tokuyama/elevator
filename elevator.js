@@ -69,7 +69,7 @@ function createBuilding() {
     scene.add(building);
 
     // 地面の作成
-    const groundGeometry = new THREE.PlaneGeometry(50, 50);
+    const groundGeometry = new THREE.PlaneGeometry(250, 250);
     const groundMaterial = new THREE.MeshPhongMaterial({ 
         color: 0x4CAF50,
         side: THREE.DoubleSide
@@ -164,7 +164,7 @@ function updateTrainPosition() {
     const x = Math.cos(trainAngle) * trainRadius;
     const z = Math.sin(trainAngle) * trainRadius;
     
-    train.position.set(x, 0.75, z);
+    train.position.set(x, 1.0, z);
     
     // 電車の向きを進行方向に合わせる
     train.rotation.y = trainAngle + Math.PI / 2;
