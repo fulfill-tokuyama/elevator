@@ -78,7 +78,7 @@ function createBuilding() {
     scene.add(building);
 
     // 地面の作成
-    const groundGeometry = new THREE.PlaneGeometry(250, 250);
+    const groundGeometry = new THREE.PlaneGeometry(750, 750);
     const groundMaterial = new THREE.MeshPhongMaterial({ 
         color: 0x4CAF50,
         side: THREE.DoubleSide
